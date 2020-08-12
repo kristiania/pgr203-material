@@ -20,6 +20,7 @@ This summary shows all the essential knowledge you should master at the end of t
 * Pair programming and teamwork
   * Ping-pong programming
   * Remove pair programming
+  * Continuous integration with Github Actions
 * Debugging
   * Starting IntelliJ in debugger
   * Pausing debugger when stuck
@@ -145,9 +146,9 @@ As remote working has become a more frequent constraint, it's important to be ab
 1. The programmers join a voice channel on Discord
 2. Programmer #1 creates a new Java project in IntelliJ and shares the IntelliJ window on Discord. Import the project into Github (VCS > Import into Version Control > Share Project on Github)
 3. Programmer #2 imports the github project in IntelliJ and shares the IntelliJ window on Discord (import either from the initial IntelliJ window or from File > New > New from Version Control). Create a new branch (under alt-9) named dev-<date> and create a test class with a failing test method. Run the test to make sure it fails (alt-shift-f10 / alt-shift-r) and commit (ctrl-k) and push the project (ctrl-shift-k)
-4. Programmer #1 shares their screen and pulls (ctrl-t / cmd-t) and runs the tests to make sure it runs and fails (alt-shift-f10 / alt-shift-r). Make the test pass and run it again (shift-f10 / ctrl-r). Refactor the code (ctrl-alt-shift-t / ctrl-t). Write a new failing test and run it to make sure it fails as expected (shift-f10 / ctrl-r). Commit (ctrl-k) and push (ctrl-alt-k)
-5. Programmer #2 does the same: share screen, pull (ctrl-t), run to see fail (shift-f10), makes pass, refactor (ctrl-alt-shift-t), writes a new test, verify that it fails (shift-f10), commits (ctrl-k) and pushes (ctrl-alt-k)
-6. Repeat until the task is complete: share screen, pull, fix, refactor, new test, commit, push
+4. Programmer #1 shares pulls (ctrl-t / cmd-t) and runs the tests to make sure it runs and fails (alt-shift-f10 / alt-shift-r). Make the test pass and run it again (shift-f10 / ctrl-r). Refactor the code (ctrl-alt-shift-t / ctrl-t). Write a new failing test and run it to make sure it fails as expected (shift-f10 / ctrl-r). Commit (ctrl-k) and push (ctrl-alt-k)
+5. Programmer #2 does the same: pull (ctrl-t), run to see fail (shift-f10), make pass, refactor (ctrl-alt-shift-t), write a new test, verify that it fails (shift-f10), commit (ctrl-k) and push (ctrl-alt-k)
+6. Repeat until the task is complete: pull, fix, refactor, new test, commit, push
 7. When complete, go to the project on github.com and merge the dev branch into the main branch by creating a "Pull request" and "Merge and Squash". This replaces the many small commits in the dev-branch with a single "squashed" commit on the main branch 
 
 Other remote pair programming approaches may also be valid, such as remote control of one programmers computer. However, most people find the keyboard lag too disturbing in these situations.  
