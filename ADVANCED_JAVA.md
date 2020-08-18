@@ -533,7 +533,7 @@ public class ProductDao {
 ### Connecting to a database and reading data
 
 ```java
-public class orderdao {
+public class OrderDao {
 
     private DataSource dataSource;
 
