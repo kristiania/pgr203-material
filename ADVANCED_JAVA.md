@@ -490,7 +490,7 @@ public class ProductDao {
         properties.load(new FileReader("demo.properties"));
         
         // Never store database passwords in the source code or in git! They are the master
-        //  key to your most valauble asset: You data
+        //  key to your most valuable asset: You data
         dataSource.setPassword(properties.getProperty("dataSource.password"));
         
         ProductDao productDao = new ProductDao(dataSource);
@@ -577,7 +577,7 @@ public class OrderDao {
 
 ## Tools
 
-### IntellJ shortcuts
+### IntelliJ shortcuts
 
 | Shortcut (Windows)    | Shortcut (Mac)    | Command                           |
 |-----------------------|-------------------|-----------------------------------|
