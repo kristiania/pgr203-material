@@ -592,6 +592,22 @@ public class OrderDao {
 
 Make yourself familiar with `Refactor this` (ctrl-alt-shift-t / ctrl-t) and use it to learn the shortcut keys for your favorite refactorings like Extract method, Rename and Inline.
 
+### Refactoring
+
+> _"Make the change easy, then make the easy change"_ - Kent Beck
+
+Refactoring is the process of changing the structure of code without changing its behavior. It is an essential skill in order to develop a program that should grow and evolve over time. Many refactoring operations are supported by shortcuts in IntelliJ and other programmer tools.
+
+You should try to practice the following refactorings:
+
+* Rename (rename variable, method, class, parameter)
+* Extract method (extract a piece of code into a new method)
+* Introduce variable (assign an expression to a new local variable)
+* Introduce parameter (convert a local variable or expression into a method parameter)
+* Inline (replace a method call or variable reference with its contents)
+
+Learn more: [Refactoring, by Martin Fowler, with Kent Beck](https://martinfowler.com/books/refactoring.html)
+
 ### Git commands
 
 | Command       | Description                             | IntelliJ shortcut      |
