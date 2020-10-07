@@ -620,6 +620,40 @@ Learn more: [Refactoring, by Martin Fowler, with Kent Beck](https://martinfowler
 | `git pull`    | Update local copy with others' changes  | ctrl-t / cmd-t        |
 | `git log`     | View change history                     | View > Tool Windows > Version control |
 
+### Github Actions
+
+Basic setup for running Maven, generating test reports and **limit run time**! This file should be checked into your repository as `.github/workflows/maven.yml`:
+
+```yaml
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Build with Maven
+      run: mvn test --batch-mode -Dmaven.test.failure.ignore=true
+    - name: Publish Test Report
+      uses: scacap/action-surefire-report@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+
 ### Maven `pom.xml` syntax
 
 ```xml
