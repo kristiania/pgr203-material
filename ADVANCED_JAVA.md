@@ -320,6 +320,39 @@ public class HttpClient {
 }
 ```
 
+### Transfer data from a resource packed into the Jar via `src/main/resources`
+
+When Maven builds a project, files under `src/main/resouces` are copied to `target/classes` and when the `.jar`-file is generated, these files are included. The method `Class#getResourceAsStream()` can be used to read files in jar-file. The paths are relative to the Class-object that loads the resource. If you want to get the file which started out as `src/main/resources/css/style.css` and was packaged into the jar-file as `/css/style.css`, you have to use `getClass().getResourceAsStream("/css/style.css")` (notice the initial "/"). If the resource isn't found in the jar-file, `getResourceAsStream()` returns null.
+
+```java
+package no.kristiania.http;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class ResourceOutput {
+
+    public static void main(String[] args) throws IOException {
+        new ResourceOutput().outputFile(args[0]);
+    }
+
+    private void outputFile(String filename) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (InputStream resourceStream = getClass().getResourceAsStream(filename)) {
+            if (resourceStream == null) {
+                throw new IOException("File not found: " + filename);
+            }
+            resourceStream.transferTo(buffer);
+        }
+
+        System.out.println("Content-Length: " + buffer.toByteArray().length);
+        System.out.write(buffer.toByteArray());
+    }
+}
+```
+
+
 ## JDBC
 
 ### Preconditions
