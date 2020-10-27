@@ -10,28 +10,53 @@ This summary shows all the essential knowledge you should master at the end of t
 
 ## Table of contents
 
-
-## Programmer skills
-
-* Test-driven development
-  * See the test fail before implementing it
-  * Make it pass with as little code as possible
-  * Refactor the code before adding the next test
-* Pair programming and teamwork
-  * Ping-pong programming
-  * Remove pair programming
-  * Continuous integration with Github Actions
-* Debugging
-  * Starting IntelliJ in debugger
-  * Pausing debugger when stuck
-  * Adding breakpoints
-  * Examine program state
-* Programming discipline
-  * Making something small work and expending it
-  * What happens when you program tired
-  * Giving and receiving feedback
+* [Basic Java Syntax](#basic-java-syntax)
+  * [A simple Java class](#a-simple-java-class)
+  * [JUnit test](#junit-test)
+* [Programming Practice](#programming-practice)
+  * [Ping-pong programming: Pair programming with test-driven development](#ping-pong-programming-pair-programming-with-test-driven-development)
+  * [Remote pair programming, using IntelliJ and screen sharing](#remote-pair-programming-using-intellij-and-screen-sharing)
+* [Sockets and IO](#sockets-and-io)
+  * [Reading bytes from a stream](#reading-bytes-from-a-stream)
+  * [Accepting an incoming connection and writing data](#accepting-an-incoming-connection-and-writing-data)
+  * [Connecting to a socket, reading and writing data](#connecting-to-a-socket-reading-and-writing-data)
+  * [Transfer data from a resource packed into the Jar via src/main/resources](#transfer-data-from-a-resource-packed-into-the-jar-via-srcmainresources)
+  * [The structure of HTTP requests and responses](#the-structure-of-http-requests-and-responses)
+* [JDBC](#jdbc)
+  * [Preconditions](#preconditions)
+  * [Testing database access objects](#testing-database-access-objects)
+  * [Set up PostgreSQL database](#set-up-postgresql-database)
+  * [Connecting to a database and inserting or updating data](#connecting-to-a-database-and-inserting-or-updating-data)
+  * [Connecting to a database and reading data](#connecting-to-a-database-and-reading-data)
+* [Tools](#tools)
+  * [IntelliJ shortcuts](#intellij-shortcuts)
+  * [Refactoring](#refactoring)
+  * [Git commands](#git-commands)
+  * [Github Actions](#github-actions)
+  * [Maven pom.xml syntax](#maven-pomxml-syntax)
+    * [Basic mvn commands](#basic-mvn-commands-run-from-view---tool-windows---maven)
+    * [Essential dependencies](#essential-dependencies)
+    * [Essential plugins](#essential-plugins)
+* [PlantUML](#plantuml)
 
 ## Basic Java Syntax
+
+### A simple Java class
+
+You should recognize the elements of the following class in order to be ready for more advanced Java.
+
+These words I assume you know:
+
+* variable
+* method
+* parameter
+* argument
+* parse
+* protocol
+* inheritance, superclass, subclass
+* override
+* overload
+
 
 ```java
 // It's good practice for all your Java classes to live in a `package`.
@@ -100,7 +125,7 @@ public class QueryString {
 ```
 
 
-## JUnit test
+### JUnit test
 
 ```java
 package no.kristiania.http;
@@ -309,20 +334,56 @@ public class HttpClient {
      status-line = HTTP-version SP status-code SP reason-phrase CRLF
      header-field = field-name ":" OWS field-value OWS
          */
-
-
-        // As FileDemoProgram
-        int c;
-        while ((c = socket.getInputStream().read()) != -1) {
-            System.out.print((char)c);
+      
+        Map<String, String> headers = new HashMap<>();
+        String headerLine;
+        // read one line at a time and assign to "header"
+        //  If the result of readLine was null, terminate the loop
+        while ((header = readLine(socket)) != null) {
+            // response header consists "name: value"
+            int colonPos = headerLine.indexOf(':');
+            headers.put(
+                headerLine.substring(0, colonPos),
+                headerLine.substring(colonPos+1).trim()
+            );
         }
+        
+        // The server tells the client how many bytes are in the
+        //   response body in the header "Content-Length"
+        int contentLength = Integer.parseInt(headers.get("Content-Length"));
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < contentLength; i++) {
+            // Read content body based on content-length
+            body.append((char) socket.getInputStream().read());
+        }
+        System.out.println(body.toString());
+    }
+
+    public static String readLine(Socket socket) throws IOException {
+        StringBuilder line = new StringBuilder();
+        int c;
+
+        // read one byte from the socket at a time, assigning it to `c`
+        //  if the input stream is finished, read() returns -1 and we 
+        //  finish reading
+        while ((c = socket.getInputStream().read()) != -1) {
+            // each line ends with \r\n (CRLF - carriage return, line feed)
+            if (c == '\r') {
+                // read and ignore the following \n
+                socket.getInputStream().read();
+                break; // Terminate the while-loop
+            }
+            // append each byte as a character to the current line
+            line.append((char)c);
+        }
+        return line.toString();
     }
 }
 ```
 
 ### Transfer data from a resource packed into the Jar via `src/main/resources`
 
-When Maven builds a project, files under `src/main/resouces` are copied to `target/classes` and when the `.jar`-file is generated, these files are included. The method `Class#getResourceAsStream()` can be used to read files in jar-file. The paths are relative to the Class-object that loads the resource. If you want to get the file which started out as `src/main/resources/css/style.css` and was packaged into the jar-file as `/css/style.css`, you have to use `getClass().getResourceAsStream("/css/style.css")` (notice the initial "/"). If the resource isn't found in the jar-file, `getResourceAsStream()` returns null.
+When Maven builds a project, files under `src/main/resouces` are copied to `target/classes` and when the `.jar`-file is generated, these files are included. The method `Class#getResourceAsStream()` can be used to read files in jar-file. The paths are relative to the Class-object that loads the resource. If you want to get the file which started out as `src/main/resources/css/style.css` and was packaged into the jar-file as `/css/style.css`, you have to use `getClass().getResourceAsStream("/css/style.css")` (notice the initial "/"). If the resource isn't found in the jar-file, `getResourceAsStream()` returns null.    
 
 ```java
 package no.kristiania.http;
@@ -351,6 +412,24 @@ public class ResourceOutput {
     }
 }
 ```
+
+### The structure of HTTP requests and responses
+
+HTTP (the HyperText Transfer Protocol) is used to communicate between a web server and a web browser, such as Chrome. It's a text-based protocol, so we can implement our own HTTP server without too much effort. You can learn about HTTP by reading [RFC 7230](https://tools.ietf.org/html/rfc7230), chapter 1-3.
+
+#### Example client request:
+
+     GET /index.html HTTP/1.1
+     Host: www.example.com
+
+### Example server response:
+
+     HTTP/1.1 200 OK
+     Content-Length: 25
+     Connection: close
+     Content-Type: text/html
+
+     <bold>Hello World!</bold>
 
 
 ## JDBC
@@ -772,14 +851,21 @@ jobs:
 * `maven-surefire-plugin`: Used to run tests. (Needed for JUnit 5, but not JUnit 4)
 * `maven-shade-plugin`: Used to make the jar-file executable with `java -jar <jarfile>`
 
-## Some words I assume you know:
+## PlantUML
 
-* variable
-* method
-* parameter
-* argument
-* parse
-* protocol
-* inheritance, superclass, subclass
-* override
-* overload
+It's nice to illustrate your code with pictures. [PlantUML](https://plantuml.com) lets you write UML code that gets transformed to diagrams automatically, for example.
+
+    Client -> Server: GET /index.html
+    Client <-- Server: <h1>Hello world</h1>
+
+This will result in the following diagram:
+
+![Sequence diagram](doc/sequence.png)
+
+You can transform this code to pictures using the online editor at https://plantuml.com or the [IntelliJ PlantUML Plugin](https://plugins.jetbrains.com/plugin/7017-plantuml-integration). With the IntelliJ plugin, you also need to install GraphViz and set it up with IntelliJ in order to work with class diagrams, component diagrams and state diagrams.
+
+1. Install the PlantUML plugin in IntelliJ
+2. [Download and install GraphViz](https://graphviz.org/download/)
+3. In IntelliJ: File > Settings > Other settings > PlantUML: Input the path to the dot.exe executable in Graphviz Dot Executable
+
+See the [PlantUML](https://plantuml.com/) web site for documentation on [Sequence](https://plantuml.com/sequence-diagram) and [Class diagrams](https://plantuml.com/class-diagram) in particular. You may also be interested in the experimental [Entity-Relationship](https://plantuml.com/ie-diagram) syntax.

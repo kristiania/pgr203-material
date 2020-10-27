@@ -1,0 +1,4 @@
+@startuml
+    Client -> Server: GET /index.html
+    Client <-- Server: <h1>Hello world</h1>
+@enduml
